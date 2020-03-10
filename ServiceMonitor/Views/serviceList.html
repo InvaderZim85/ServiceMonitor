@@ -1,0 +1,44 @@
+﻿@Master['master.html'];
+
+@Section['Content'];
+<script>
+    $(document).ready(function(){
+      $("#filter").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#serviceTable tr").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+    </script>
+    
+    <input class="form-control" input="text" placeholder="Search..." id="filter">
+    <br />
+    <table class="table table-dark table-striped">
+        <caption class="text-white">@Model.ServiceCount services checked in @Model.Duration - Last update: @Model.TimeStamp - Refresh every 30 seconds</caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Display name</th>
+                <th>Start type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="serviceTable">
+            @Each.Services
+            <tr>
+                <td>@Current.Name</td>
+                <td>@Current.DisplayName</td>
+                <td>@Current.StartType</td>
+                @If.IsRunning
+                <td><span class="text-success">@Current.State</span></td>
+                @EndIf
+
+                @IfNot.IsRunning
+                <td><span class="text-danger">@Current.State</span></td>
+                @EndIf
+            </tr>
+            @EndEach
+        </tbody>
+    </table>
+@EndSection

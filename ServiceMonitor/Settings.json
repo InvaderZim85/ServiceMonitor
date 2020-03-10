@@ -1,0 +1,11 @@
+﻿{
+    "Rest": {
+        "ServiceName": "serviceMonitor",
+        "Port": 8085
+    },
+    "Service": {
+        "ServiceName": "ServiceMonitor",
+        "DisplayName": "Service Monitor",
+        "Description": "Hosts a small web page (via REST) and shows the state of some defined services"
+    }
+}
