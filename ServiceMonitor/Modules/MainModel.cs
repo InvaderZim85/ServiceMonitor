@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Nancy;
 using ServiceMonitor.Business;
@@ -33,18 +34,21 @@ namespace ServiceMonitor.Modules
             try
             {
                 var services = ServiceHelper.LoadServices();
+                var taskList = TaskHelper.LoadTasks();
 
                 stopWatch.Stop();
                 var data = new
                 {
                     BaseData = GetBaseData(),
-                    Services = services,
+                    Services = services.OrderBy(o => o.Name),
                     ServiceCount = services.Count,
+                    TaskList = taskList.OrderBy(o => o.Name),
+                    TaskListCount = taskList.Count,
                     Duration = stopWatch.Elapsed.FormatString(),
                     TimeStamp = DateTime.Now
                 };
 
-                return View["serviceList", data];
+                return View["entryList", data];
             }
             catch (Exception ex)
             {

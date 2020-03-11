@@ -25,7 +25,7 @@ namespace ServiceMonitor.Business
             var services = Helper.LoadJsonFile<List<string>>(path);
 
             // Step 2: Get all services which are currently are running
-            return LoadServiceController().Where(w => services.Any(a => a.ContainsIgnoreCase(w.ServiceName)))
+            return LoadServiceController().Where(w => services.Any(a => a.EqualsIgnoreCase(w.ServiceName)))
                 .Select(s => (ServiceEntry) s).ToList();
         }
 
