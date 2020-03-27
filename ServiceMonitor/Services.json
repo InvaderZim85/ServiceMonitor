@@ -1,37 +1,7 @@
 ﻿[
     {
-        "Name": "EMP.BandBrandService",
-        "Port": 8080,
-        "Description": ""
-    },
-    {
-        "Name": "EMP.BandBrandService.Crawler",
-        "Port": 8080,
-        "Description": ""
-    },
-    {
-        "Name": "EMP.Service.PrudsysImport",
-        "Port": 8080,
-        "Description": ""
-    },
-    {
-        "Name": "EMP.Service.RestService",
-        "Port": 8080,
-        "Description": ""
-    },
-    {
-        "Name": "AzubiRestService",
-        "Port": 8080,
-        "Description": "Small description..."
-    },
-    {
-        "Name": "EMP.Service.ProductPreparator",
-        "Port": 8080,
-        "Description": ""
-    },
-    {
-        "Name": "EMP.Service.SamplePicture",
-        "Port": 8080,
+        "Name": "",
+        "Port": "",
         "Description": ""
     }
 ]
