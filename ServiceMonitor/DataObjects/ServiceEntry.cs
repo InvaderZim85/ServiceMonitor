@@ -13,6 +13,11 @@ namespace ServiceMonitor.DataObjects
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets the name without any dots
+        /// </summary>
+        public string CleanName => Name.Replace(".", "").Replace(" ", "");
+
+        /// <summary>
         /// Gets or sets the display name of the service
         /// </summary>
         public string DisplayName { get; set; }
@@ -31,6 +36,16 @@ namespace ServiceMonitor.DataObjects
         /// Gets or sets the value which indicates if the service is currently running or not
         /// </summary>
         public bool IsRunning { get; set; }
+
+        /// <summary>
+        /// Gets or sets the port of the service
+        /// </summary>
+        public string Port { get; set; }
+
+        /// <summary>
+        /// Gets or sets the description of the service
+        /// </summary>
+        public string Description { get; set; }
 
         /// <summary>
         /// Converts the <see cref="ServiceController"/> object into a <see cref="ServiceEntry"/> object

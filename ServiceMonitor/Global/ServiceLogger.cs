@@ -29,6 +29,21 @@ namespace ServiceMonitor.Global
         }
 
         /// <summary>
+        /// Logs a warn message
+        /// </summary>
+        /// <param name="message">The message</param>
+        public static void Warn(string message)
+        {
+            var log = new LogEventInfo
+            {
+                Level = LogLevel.Warn,
+                Message = message
+            };
+
+            WriteLog(log);
+        }
+
+        /// <summary>
         /// Logs an error message
         /// </summary>
         /// <param name="message">The message</param>

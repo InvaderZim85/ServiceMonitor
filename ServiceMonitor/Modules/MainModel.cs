@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using Nancy;
 using ServiceMonitor.Business;
 using ServiceMonitor.Global;
-using ZimLabs.Utility.Extensions;
 
 namespace ServiceMonitor.Modules
 {

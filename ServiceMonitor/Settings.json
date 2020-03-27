@@ -1,7 +1,7 @@
 ﻿{
     "Rest": {
-        "ServiceName": "serviceMonitor",
-        "Port": 8085
+        "ServiceName": "monitor",
+        "Port": 8095
     },
     "Service": {
         "ServiceName": "ServiceMonitor",

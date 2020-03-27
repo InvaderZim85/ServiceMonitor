@@ -15,18 +15,38 @@ namespace ServiceMonitor.Business
     internal static class ServiceHelper
     {
         /// <summary>
+        /// Contains the dictionary with the services
+        /// </summary>
+        private static List<ServiceEntry> _servicesInfoList = new List<ServiceEntry>();
+
+        /// <summary>
         /// Loads the list with the desired services and their current state
         /// </summary>
         /// <returns>The list with the services</returns>
         public static List<ServiceEntry> LoadServices()
         {
             // Step 1: Get the desired services
-            var path = Path.Combine(ZimLabs.Utility.Global.GetBaseFolder(), "Services.json");
-            var services = Helper.LoadJsonFile<List<string>>(path);
+            LoadServiceSettings();
 
             // Step 2: Get all services which are currently are running
-            return LoadServiceController().Where(w => services.Any(a => a.EqualsIgnoreCase(w.ServiceName)))
-                .Select(s => (ServiceEntry) s).ToList();
+            var tmpServices = LoadServiceController();
+
+            var result = new List<ServiceEntry>();
+
+            foreach (var service in tmpServices)
+            {
+                var info = _servicesInfoList.FirstOrDefault(f => f.Name.EqualsIgnoreCase(service.ServiceName));
+                if (info == null)
+                    continue;
+
+                var tmpResult = (ServiceEntry) service;
+                tmpResult.Port = info.Port ?? "/";
+                tmpResult.Description = info.Description ?? "/";
+
+                result.Add(tmpResult);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -36,6 +56,22 @@ namespace ServiceMonitor.Business
         private static IEnumerable<ServiceController> LoadServiceController()
         {
             return ServiceController.GetServices(Environment.MachineName);
+        }
+
+        /// <summary>
+        /// Loads all service settings and saves them into the service dictionary
+        /// </summary>
+        public static void LoadServiceSettings()
+        {
+            try
+            {
+                var path = Path.Combine(ZimLabs.Utility.Global.GetBaseFolder(), "Services.json");
+                _servicesInfoList = Helper.LoadJsonFile<List<ServiceEntry>>(path);
+            }
+            catch (Exception ex)
+            {
+                ServiceLogger.Error(nameof(LoadServiceSettings), ex);
+            }
         }
     }
 }

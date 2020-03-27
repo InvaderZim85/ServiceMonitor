@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using ServiceMonitor.Business;
 using ServiceMonitor.Global;
 using Topshelf;
 using ZimLabs.Utility.Extensions;
@@ -19,6 +20,8 @@ namespace ServiceMonitor
         {
             try
             {
+                ServiceHelper.LoadServiceSettings();
+
                 if (args.Any(a => a.ContainsIgnoreCase("debug")))
                 {
                     var manager = new ServiceManager();
