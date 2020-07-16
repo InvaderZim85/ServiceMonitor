@@ -4,6 +4,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServiceMonitor.DataObjects;
+using ZimLabs.CoreLib;
 
 namespace ServiceMonitor.Global
 {
@@ -38,7 +39,7 @@ namespace ServiceMonitor.Global
         /// <returns>The settings</returns>
         private static Settings LoadSettings()
         {
-            var path = Path.Combine(ZimLabs.Utility.Global.GetBaseFolder(), "Settings.json");
+            var path = Path.Combine(Core.GetBaseFolder(), "Settings.json");
 
             return LoadJsonFile<Settings>(path);
         }

@@ -1,4 +1,5 @@
 ﻿using System.ServiceProcess;
+using Newtonsoft.Json;
 
 namespace ServiceMonitor.DataObjects
 {
@@ -15,26 +16,31 @@ namespace ServiceMonitor.DataObjects
         /// <summary>
         /// Gets the name without any dots
         /// </summary>
+        [JsonIgnore]
         public string CleanName => Name.Replace(".", "").Replace(" ", "");
 
         /// <summary>
         /// Gets or sets the display name of the service
         /// </summary>
+        [JsonIgnore]
         public string DisplayName { get; set; }
 
         /// <summary>
         /// Gets or sets the state of the service
         /// </summary>
+        [JsonIgnore]
         public string State { get; set; }
 
         /// <summary>
         /// Gets or sets the start type of the service
         /// </summary>
+        [JsonIgnore]
         public string StartType { get; set; }
 
         /// <summary>
         /// Gets or sets the value which indicates if the service is currently running or not
         /// </summary>
+        [JsonIgnore]
         public bool IsRunning { get; set; }
 
         /// <summary>

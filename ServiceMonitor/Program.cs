@@ -3,7 +3,7 @@ using System.Linq;
 using ServiceMonitor.Business;
 using ServiceMonitor.Global;
 using Topshelf;
-using ZimLabs.Utility.Extensions;
+using ZimLabs.CoreLib.Extensions;
 
 namespace ServiceMonitor
 {

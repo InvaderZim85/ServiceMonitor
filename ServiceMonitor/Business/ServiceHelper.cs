@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
+using Newtonsoft.Json;
 using ServiceMonitor.DataObjects;
 using ServiceMonitor.Global;
-using ZimLabs.Utility.Extensions;
+using ZimLabs.CoreLib;
+using ZimLabs.CoreLib.Extensions;
 
 namespace ServiceMonitor.Business
 {
@@ -65,13 +67,40 @@ namespace ServiceMonitor.Business
         {
             try
             {
-                var path = Path.Combine(ZimLabs.Utility.Global.GetBaseFolder(), "Services.json");
+                var path = Path.Combine(Core.GetBaseFolder(), "Services.json");
                 _servicesInfoList = Helper.LoadJsonFile<List<ServiceEntry>>(path);
             }
             catch (Exception ex)
             {
                 ServiceLogger.Error(nameof(LoadServiceSettings), ex);
             }
+        }
+
+        /// <summary>
+        /// Adds a new service to the service list
+        /// </summary>
+        /// <param name="service">The service which should be added</param>
+        /// <returns>true when successful, otherwise false</returns>
+        public static (bool successful, string message) AddService(ServiceEntry service)
+        {
+            if (service == null)
+                throw new ArgumentNullException(nameof(service));
+
+            // Step 1: Check if the service exist
+            var services = LoadServiceController();
+            if (!services.Any(a => a.ServiceName.EqualsIgnoreCase(service.Name)))
+                return (false, $"The service '{service.Name}' doesn't exist.");
+
+            // Step 2: Add the service
+            LoadServiceSettings();
+
+            _servicesInfoList.Add(service);
+
+            var path = Path.Combine(Core.GetBaseFolder(), "Services.json");
+            var content = JsonConvert.SerializeObject(_servicesInfoList, Formatting.Indented);
+            File.WriteAllText(path, content);
+
+            return File.Exists(path) ? (true, "") : (false, "Can't save service file.");
         }
     }
 }
