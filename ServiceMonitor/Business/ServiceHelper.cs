@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.ServiceModel;
 using System.ServiceProcess;
-using Newtonsoft.Json;
 using ServiceMonitor.DataObjects;
 using ServiceMonitor.Global;
 using ZimLabs.CoreLib;
@@ -14,30 +14,49 @@ namespace ServiceMonitor.Business
     /// <summary>
     /// Provides the functions to check the running services
     /// </summary>
-    internal static class ServiceHelper
+    internal sealed class ServiceHelper
     {
         /// <summary>
-        /// Contains the dictionary with the services
+        /// Contains the path of the settings file
         /// </summary>
-        private static List<ServiceEntry> _servicesInfoList = new List<ServiceEntry>();
+        private readonly string _filePath = Path.Combine(Core.GetBaseFolder(), "Services.json");
+
+        /// <summary>
+        /// Backing field for <see cref="ServiceList"/>
+        /// </summary>
+        private List<ServiceEntry> _serviceList;
+
+        /// <summary>
+        /// Gets the list with the available services
+        /// </summary>
+        public List<ServiceEntry> ServiceList
+        {
+            get
+            {
+                if (_serviceList == null || !_serviceList.Any())
+                    LoadServices();
+
+                return _serviceList;
+            }
+        }
 
         /// <summary>
         /// Loads the list with the desired services and their current state
         /// </summary>
         /// <returns>The list with the services</returns>
-        public static List<ServiceEntry> LoadServices()
+        private void LoadServices()
         {
             // Step 1: Get the desired services
-            LoadServiceSettings();
+            var tmpServiceList = Helper.LoadJsonFile<List<ServiceEntry>>(_filePath) ?? new List<ServiceEntry>();
 
             // Step 2: Get all services which are currently are running
             var tmpServices = LoadServiceController();
 
-            var result = new List<ServiceEntry>();
+            _serviceList = new List<ServiceEntry>();
 
             foreach (var service in tmpServices)
             {
-                var info = _servicesInfoList.FirstOrDefault(f => f.Name.EqualsIgnoreCase(service.ServiceName));
+                var info = tmpServiceList.FirstOrDefault(f => f.Name.EqualsIgnoreCase(service.ServiceName));
                 if (info == null)
                     continue;
 
@@ -45,62 +64,64 @@ namespace ServiceMonitor.Business
                 tmpResult.Port = info.Port ?? "/";
                 tmpResult.Description = info.Description ?? "/";
 
-                result.Add(tmpResult);
+                _serviceList.Add(tmpResult);
             }
-
-            return result;
         }
 
         /// <summary>
         /// Loads the service controller
         /// </summary>
         /// <returns>The array with the services</returns>
-        private static IEnumerable<ServiceController> LoadServiceController()
+        private IEnumerable<ServiceController> LoadServiceController()
         {
             return ServiceController.GetServices(Environment.MachineName);
-        }
-
-        /// <summary>
-        /// Loads all service settings and saves them into the service dictionary
-        /// </summary>
-        public static void LoadServiceSettings()
-        {
-            try
-            {
-                var path = Path.Combine(Core.GetBaseFolder(), "Services.json");
-                _servicesInfoList = Helper.LoadJsonFile<List<ServiceEntry>>(path);
-            }
-            catch (Exception ex)
-            {
-                ServiceLogger.Error(nameof(LoadServiceSettings), ex);
-            }
         }
 
         /// <summary>
         /// Adds a new service to the service list
         /// </summary>
         /// <param name="service">The service which should be added</param>
-        /// <returns>true when successful, otherwise false</returns>
-        public static (bool successful, string message) AddService(ServiceEntry service)
+        /// <exception cref="EndpointNotFoundException">Will be thrown when the specified service was not found</exception>
+        public void AddService(ServiceEntry service)
         {
             if (service == null)
                 throw new ArgumentNullException(nameof(service));
 
-            // Step 1: Check if the service exist
+            // Step 1: Check if the given service is an existing service
             var services = LoadServiceController();
-            if (!services.Any(a => a.ServiceName.EqualsIgnoreCase(service.Name)))
-                return (false, $"The service '{service.Name}' doesn't exist.");
+            var tmpService = services?.FirstOrDefault(f => f.ServiceName.EqualsIgnoreCase(service.Name));
+            if (tmpService == null)
+                throw new EndpointNotFoundException();
 
-            // Step 2: Add the service
-            LoadServiceSettings();
+            var tmpServiceEntry = (ServiceEntry) tmpService;
+            tmpServiceEntry.Port = service.Port;
+            tmpServiceEntry.Description = service.Description;
 
-            _servicesInfoList.Add(service);
+            // Check if the service already exists
+            if (ServiceList.Any(a => a.Name.EqualsIgnoreCase(service.Name)))
+                return;
 
-            var path = Path.Combine(Core.GetBaseFolder(), "Services.json");
-            var content = JsonConvert.SerializeObject(_servicesInfoList, Formatting.Indented);
-            File.WriteAllText(path, content);
+            ServiceList.Add(tmpServiceEntry);
 
-            return File.Exists(path) ? (true, "") : (false, "Can't save service file.");
+            Helper.WriteJsonFile(_filePath, ServiceList);
+        }
+
+        /// <summary>
+        /// Deletes the desired service
+        /// </summary>
+        /// <param name="service">The name of the service which should be deleted</param>
+        public void DeleteService(string service)
+        {
+            if (string.IsNullOrEmpty(service))
+                throw new ArgumentNullException(nameof(service));
+
+            var tmpService = ServiceList.FirstOrDefault(f => f.Name.EqualsIgnoreCase(service));
+            if (tmpService == null)
+                return; // No service available, so everything is fine...
+
+            ServiceList.Remove(tmpService);
+
+            Helper.WriteJsonFile(_filePath, ServiceList);
         }
     }
 }

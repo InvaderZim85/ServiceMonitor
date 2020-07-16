@@ -1,0 +1,50 @@
+﻿@Master['master.html'];
+
+@Section['Content'];
+
+@Each.Metadata
+<div class="card bg-dark text-white">
+    @If.IsGet
+    <div class="card-header bg-success text-white">
+    @EndIf
+    @If.IsPost
+    <div class="card-header bg-warning text-white">
+    @EndIf
+    @If.IsDelete
+    <div class="card-header bg-danger text-white">
+    @EndIf
+        <strong>[@Current.Method]</strong> @Current.Path 
+    </div>
+    <div class="card-body">
+        <table class="table-borderless table-dark">
+            <tbody>
+                <tr>
+                    <td class="titleCell">Description:</td>
+                    <td>@Current.Description</td>
+                </tr>
+                <tr>
+                    <td class="titleCell">Segments:</td>
+                    <td>@Current.Segments</td>
+                </tr>
+                <tr>
+                    <td class="titleCell">Response type:</td>
+                    <td>@Current.ResponseType</td>
+                </tr>
+                <tr>
+                    <td class="titleCell">Success code:</td>
+                    <td>@Current.ResponseSuccess</td>
+                </tr>
+                <tr>
+                    <td class="titleCell">Failure code(s):</td>
+                    <td>
+                        @Current.ResponseFailure
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<br />
+@EndEach
+
+@EndSection

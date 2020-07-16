@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ServiceMonitor.DataObjects;
@@ -58,9 +59,24 @@ namespace ServiceMonitor.Global
             if (!File.Exists(path))
                 throw new FileNotFoundException($"The desired file '{path}' is missing.");
 
-            var content = File.ReadAllText(path);
+            var content = File.ReadAllText(path, Encoding.UTF8);
 
             return JsonConvert.DeserializeObject<T>(content);
+        }
+
+        /// <summary>
+        /// Writes an object as JSON formatted string into the specified file
+        /// </summary>
+        /// <param name="path">The path of the file</param>
+        /// <param name="content">The content</param>
+        public static void WriteJsonFile(string path, object content)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            var tmpContent = content == null ? "" : JsonConvert.SerializeObject(content, Formatting.Indented);
+
+            File.WriteAllText(path, tmpContent);
         }
 
         /// <summary>

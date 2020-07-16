@@ -20,8 +20,6 @@ namespace ServiceMonitor
         {
             try
             {
-                ServiceHelper.LoadServiceSettings();
-
                 if (args.Any(a => a.ContainsIgnoreCase("debug")))
                 {
                     var manager = new ServiceManager();
